@@ -1,0 +1,8 @@
+E:\git\cs_voa\cs_voa\bin\Release\cs_voa.exe
+E:\git\cs_voa\cs_voa\bin\Release\cs_voa.pdb
+E:\git\cs_voa\cs_voa\obj\x86\Release\cs_voa.Form1.resources
+E:\git\cs_voa\cs_voa\obj\x86\Release\cs_voa.Properties.Resources.resources
+E:\git\cs_voa\cs_voa\obj\x86\Release\cs_voa.csproj.GenerateResource.Cache
+E:\git\cs_voa\cs_voa\obj\x86\Release\cs_voa.exe
+E:\git\cs_voa\cs_voa\obj\x86\Release\cs_voa.pdb
+E:\git\cs_voa\cs_voa\bin\Release\HtmlAgilityPack.dll
