@@ -18,7 +18,15 @@ namespace cs_voa
 
         //获取指定网页内容
         public static string get_content(string url) {
-            return wb.DownloadString(url);
+            try
+            {
+                return wb.DownloadString(url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "";
+            }
         }
 
         //获取首页内容
@@ -52,7 +60,7 @@ namespace cs_voa
             }
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(content);
-            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//div[@id='list']");
+            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//div[@class='List']");
             try
             {
                 return nodes[0].FirstChild;
@@ -70,8 +78,16 @@ namespace cs_voa
             }
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(cont);
-            HtmlNode  node = doc.DocumentNode.SelectSingleNode("//div[@id='content']");
-            return node.InnerText;
+            HtmlNode  node = doc.DocumentNode.SelectSingleNode("//div[@class='Content']");
+            try
+            {
+                return node.InnerText;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("no content found!");
+                return "";
+            }
         }
 
         public static string getMp3(string cont)
@@ -82,15 +98,18 @@ namespace cs_voa
             }
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(cont);
-            HtmlNode node = doc.DocumentNode.SelectSingleNode("//div[@id='playbar']");
+            //HtmlNode node = doc.DocumentNode.SelectSingleNode("//div[@id='playbar']");
+            //可以直接拿到mp3 url了
+            HtmlNode node = doc.DocumentNode.SelectSingleNode("//a[@id='mp3']");
+
             try
             {
-                string url = node.InnerText.Trim();
+                /*string url = node.InnerText.Trim();
                 url = url.Replace("Player(\"", "").Replace("\");","");
                 if (url.StartsWith("/")) {
                     url = Util.url_mp3root + url;
-                }
-                return url;
+                }*/
+                return node.Attributes["href"].Value;
             }
             catch (Exception ex)
             {
@@ -99,6 +118,8 @@ namespace cs_voa
             }
         }
 
+
+        //废弃
         public static string getRealMp3(string url,string refe) {
             Console.WriteLine("ref:" + refe);
             try

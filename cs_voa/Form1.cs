@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using HtmlAgilityPack;
+using SHDocVw;
 
 namespace cs_voa
 {
@@ -29,26 +30,37 @@ namespace cs_voa
             treeView1.Nodes.Clear();
             string cont = Util.get_homepage();
             HtmlNode side_nav = Util.get_column(cont);
-            //MessageBox.Show(side_nav.InnerHtml);
-            HtmlNodeCollection sub_ul = side_nav.SelectNodes("ul");
-            HtmlNodeCollection sub_root = side_nav.SelectNodes("div");
-            for (int i = 0; i < sub_root.Count-1; i++) {
-                TreeNode anode = new TreeNode(sub_root[i].InnerText);
-                anode.Tag = sub_root[i].SelectSingleNode("a").GetAttributeValue("href", "/");
-                //MessageBox.Show(sub_ul[i].InnerHtml);
-                HtmlNodeCollection sub_ul_li = sub_ul[i].SelectNodes("li");
+
+            try
+            {
+                //MessageBox.Show(side_nav.InnerHtml);
+                HtmlNodeCollection sub_ul = side_nav.SelectNodes("ul");
+                HtmlNodeCollection sub_root = side_nav.SelectNodes("div");
+                for (int i = 0; i < sub_root.Count - 1; i++)
+                {
+                    TreeNode anode = new TreeNode(sub_root[i].InnerText);
+                    anode.Tag = sub_root[i].SelectSingleNode("a").GetAttributeValue("href", "/");
+                    //MessageBox.Show(sub_ul[i].InnerHtml);
+                    HtmlNodeCollection sub_ul_li = sub_ul[i].SelectNodes("li");
 
 
-                for (int j = 0; sub_ul_li != null && j < sub_ul_li.Count; j++) {
-                    TreeNode in_node = new TreeNode(sub_ul_li[j].InnerText);
-                    in_node.Tag = sub_ul_li[j].SelectSingleNode("a").GetAttributeValue("href", "/");
-                    anode.Nodes.Add(in_node);
+                    for (int j = 0; sub_ul_li != null && j < sub_ul_li.Count; j++)
+                    {
+                        TreeNode in_node = new TreeNode(sub_ul_li[j].InnerText);
+                        in_node.Tag = sub_ul_li[j].SelectSingleNode("a").GetAttributeValue("href", "/");
+                        anode.Nodes.Add(in_node);
+                    }
+
+
+                    //MessageBox.Show(sub_root[i].OuterHtml);
+                    //
+                    treeView1.Nodes.Add(anode);
                 }
-
-
-                //MessageBox.Show(sub_root[i].OuterHtml);
-                //
-                treeView1.Nodes.Add(anode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                MessageBox.Show("刷新失败");
             }
         }
 
@@ -96,6 +108,7 @@ namespace cs_voa
 
         }
 
+        //双击播放&显示正文
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             ListViewItem lvi = listView1.SelectedItems[0];
@@ -111,12 +124,14 @@ namespace cs_voa
             string mp3 = Util.getMp3(cont);
             Console.WriteLine("mp3-1:" + mp3);
             //mp3 = "http://play.51voa.com/87abb69e2c9c96a50bcc19e14420ce87/5b7d039d/201808/terrorist-designation-qassim-abdullah-ali-ahmed.mp3";
-            mp3 = Util.getRealMp3(mp3, url);
-            Console.WriteLine("mp3-2:" + mp3);
+            //不需要转换了；
+            //mp3 = Util.getRealMp3(mp3, url);
+            //Console.WriteLine("mp3-2:" + mp3);
             axWindowsMediaPlayer1.URL = mp3;
             axWindowsMediaPlayer1.Ctlcontrols.play();
         }
 
+        //触发翻译
         private void richTextBox1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             string word = richTextBox1.SelectedText.Trim();
@@ -125,6 +140,23 @@ namespace cs_voa
 
             //webBrowser1.Navigate(Util.getTranslate(word));
             webBrowser1.Navigate("http://m.youdao.com/dict?le=eng&q=" + word + "#ec_contentWrp");
+            IWebBrowser2 axIWebBrowser2 = (IWebBrowser2)this.webBrowser1.ActiveXInstance;
+            Zoom(axIWebBrowser2, 75);
+        }
+
+        public void Zoom(IWebBrowser2 axIWebBrowser2, int factor)
+        {
+            object pvaIn = factor;
+            try
+            {
+                axIWebBrowser2.ExecWB(OLECMDID.OLECMDID_OPTICAL_ZOOM,
+                   OLECMDEXECOPT.OLECMDEXECOPT_DONTPROMPTUSER,
+                   ref pvaIn, IntPtr.Zero);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
